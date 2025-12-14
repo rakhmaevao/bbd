@@ -1,11 +1,8 @@
-from lsprotocol import types
 from pygls.lsp.server import LanguageServer
 from pygls.workspace import TextDocument
 
+from src.token import Token, TokenModifier
 
-TOKEN_TYPES = ["variable", "keyword"]  # порядок важен!
-
-type Token = tuple
 
 class SimpleSemanticServer(LanguageServer):
     def __init__(self, name, version):
@@ -46,19 +43,18 @@ class SimpleSemanticServer(LanguageServer):
 
                     # Определяем тип
                     tok_type = "keyword" if inside else "variable"
-                    tok_type_index = TOKEN_TYPES.index(tok_type)
 
                     # Относительные координаты
                     delta_line = line_idx - prev_line
                     delta_start = start - (prev_col if delta_line == 0 else 0)
 
                     tokens.append(
-                        (
-                            delta_line,
-                            delta_start,
-                            len(word),
-                            tok_type_index,
-                            0,  # modifiers = 0
+                        Token(
+                            line=delta_line,
+                            offset=delta_start,
+                            text=word,
+                            tok_type=tok_type,
+                            tok_modifiers=[TokenModifier.readonly],
                         )
                     )
 
