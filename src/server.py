@@ -1,12 +1,11 @@
 #! /home/rakhmaevao/Projects/personal/bbd-language-extension/.venv/bin/python
-import re
-from typing import List
 from lsprotocol import types
 from pygls.lsp.server import LanguageServer
 from pygls.workspace import TextDocument
 
 # Стандартные типы токенов — используем только те, что есть в темах
 TOKEN_TYPES = ["variable", "keyword"]  # порядок важен!
+
 
 class SimpleSemanticServer(LanguageServer):
     def __init__(self, name, version):
@@ -28,11 +27,11 @@ class SimpleSemanticServer(LanguageServer):
                     pos += 1
                     continue
 
-                if line[pos] == '[':
+                if line[pos] == "[":
                     inside = True
                     pos += 1
                     continue
-                elif line[pos] == ']':
+                elif line[pos] == "]":
                     inside = False
                     pos += 1
                     continue
@@ -53,26 +52,31 @@ class SimpleSemanticServer(LanguageServer):
                     delta_line = line_idx - prev_line
                     delta_start = start - (prev_col if delta_line == 0 else 0)
 
-                    tokens.append((
-                        delta_line,
-                        delta_start,
-                        len(word),
-                        tok_type_index,
-                        0  # modifiers = 0
-                    ))
+                    tokens.append(
+                        (
+                            delta_line,
+                            delta_start,
+                            len(word),
+                            tok_type_index,
+                            0,  # modifiers = 0
+                        )
+                    )
 
                     prev_line = line_idx
                     prev_col = start
 
         return tokens
 
+
 server = SimpleSemanticServer("bracket-semantic-server", "v1")
+
 
 @server.feature(types.TEXT_DOCUMENT_DID_OPEN)
 @server.feature(types.TEXT_DOCUMENT_DID_CHANGE)
 def on_change(ls: SimpleSemanticServer, params: types.DidChangeTextDocumentParams):
     doc = ls.workspace.get_text_document(params.text_document.uri)
     ls.cached_tokens[doc.uri] = ls.lex_and_tokenize(doc)
+
 
 @server.feature(
     types.TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL,
@@ -86,6 +90,3 @@ def semantic_tokens(ls: SimpleSemanticServer, params: types.SemanticTokensParams
     for token in ls.cached_tokens.get(params.text_document.uri, []):
         data.extend(token)
     return types.SemanticTokens(data=data)
-
-if __name__ == "__main__":
-    server.start_io()

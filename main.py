@@ -1,6 +1,4 @@
-def main():
-    print("Hello from bbd-language-extension!")
-
+from src.server import server
 
 if __name__ == "__main__":
-    main()
+    server.start_io()
