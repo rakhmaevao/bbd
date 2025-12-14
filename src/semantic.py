@@ -1,13 +1,13 @@
 from pygls.lsp.server import LanguageServer
 from pygls.workspace import TextDocument
 
-from src.token import Token, TokenModifier
+from src.token import Token
 
 
 class SimpleSemanticServer(LanguageServer):
     def __init__(self, name, version):
         super().__init__(name, version)
-        self.cached_tokens = {}
+        self.cached_tokens: dict[str, list[Token]] = {}
 
     def lex_and_tokenize(self, doc: TextDocument) -> list[Token]:
         tokens = []
@@ -54,7 +54,6 @@ class SimpleSemanticServer(LanguageServer):
                             offset=delta_start,
                             text=word,
                             tok_type=tok_type,
-                            tok_modifiers=[TokenModifier.readonly],
                         )
                     )
 

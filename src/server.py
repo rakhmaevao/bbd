@@ -4,7 +4,7 @@ from functools import reduce
 from lsprotocol import types
 
 from src.semantic import SimpleSemanticServer
-from src.token import TOKEN_TYPES
+from src.token import TOKEN_TYPES, TokenModifier
 
 server = SimpleSemanticServer("bracket-semantic-server", "v1")
 
@@ -32,7 +32,7 @@ def semantic_tokens(ls: SimpleSemanticServer, params: types.SemanticTokensParams
                 token.offset,
                 len(token.text),
                 TOKEN_TYPES.index(token.tok_type),
-                reduce(operator.or_, token.tok_modifiers, 0),
+                reduce(operator.or_, [TokenModifier.readonly], 0),
             ]
         )
     return types.SemanticTokens(data=data)

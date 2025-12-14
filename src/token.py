@@ -19,4 +19,3 @@ class Token:
     text: str
 
     tok_type: str = ""
-    tok_modifiers: list[TokenModifier] = attrs.field(factory=list)
