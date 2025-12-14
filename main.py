@@ -1,3 +1,5 @@
+#! /home/rakhmaevao/Projects/personal/bbd-language-extension/.venv/bin/python
+
 from src.server import server
 
 if __name__ == "__main__":
